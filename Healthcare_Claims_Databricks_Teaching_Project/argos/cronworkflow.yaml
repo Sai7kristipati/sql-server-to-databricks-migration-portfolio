@@ -1,0 +1,37 @@
+# Simplified educational Argo CronWorkflow
+# This demonstrates orchestration concepts only.
+
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+
+metadata:
+  name: healthcare-claims-pipeline
+
+spec:
+  schedule: "0 5 * * *"
+
+  workflowSpec:
+    entrypoint: main
+
+    templates:
+
+      - name: main
+        steps:
+
+          - - name: process-claims
+              template: process
+
+          - - name: validate-results
+              template: validate
+
+      - name: process
+        container:
+          image: python:3.11
+          command: ["python"]
+          args: ["claims_etl.py"]
+
+      - name: validate
+        container:
+          image: python:3.11
+          command: ["python"]
+          args: ["validation.py"]
